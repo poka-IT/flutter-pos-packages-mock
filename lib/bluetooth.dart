@@ -3,6 +3,42 @@ library bluetooth;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart' as fbp;
 
+enum LogLevel {
+  debug,
+  info,
+  warning,
+  error,
+  none;
+}
+
+class Logger {
+  static LogLevel level = LogLevel.info;
+
+  static void debug(String message) {
+    if (level.index <= LogLevel.debug.index) {
+      debugPrint('[DEBUG] $message');
+    }
+  }
+
+  static void info(String message) {
+    if (level.index <= LogLevel.info.index) {
+      debugPrint('[INFO] $message');
+    }
+  }
+
+  static void warning(String message) {
+    if (level.index <= LogLevel.warning.index) {
+      debugPrint('[WARNING] $message');
+    }
+  }
+
+  static void error(String message) {
+    if (level.index <= LogLevel.error.index) {
+      debugPrint('[ERROR] $message');
+    }
+  }
+}
+
 enum BluetoothSignal {
   good(0),
   normal(0, 0),
@@ -20,9 +56,13 @@ enum PrinterStatus {
   good(0),
   writeFailed(0),
   paperNotFound(0),
+  paperJams(0),
   tooHot(0),
   lowBattery(0),
   printing(0),
+  unrecoverable(0),
+  uncovering(0),
+  noResponse(0),
   unknown(0);
 
   final int priority;
@@ -57,6 +97,10 @@ class BluetoothDevice {
   final String address = '';
 
   BluetoothDevice({fbp.BluetoothDevice? device});
+
+  factory BluetoothDevice.demo() {
+    return BluetoothDevice();
+  }
 
   Future<void> connect() => Future.value();
   Future<void> disconnect() => Future.value();
@@ -135,4 +179,20 @@ class Printer extends ChangeNotifier {
 
 class CatPrinter extends PrinterManufactory {
   const CatPrinter({int feedPaperByteSize = 0});
+}
+
+class XPrinter extends PrinterManufactory {
+  const XPrinter({
+    int widthMM = 58,
+    int widthBits = 384,
+    int serviceUuid = 0,
+    int writerChar = 0,
+    int readerChar = 0,
+  }) : super(
+          widthMM: widthMM,
+          widthBits: widthBits,
+          serviceUuid: serviceUuid,
+          writerChar: writerChar,
+          readerChar: readerChar,
+        );
 }
